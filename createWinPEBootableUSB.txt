@@ -1,2 +1,0 @@
-copype amd64 c:\winpe_amd64
-makewinpemedia /ufd c:\winpe_amd64 e:
