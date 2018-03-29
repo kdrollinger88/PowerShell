@@ -40,7 +40,6 @@ $Parent = $OldUser.Parent
 $UserSettings = @{
 'SamAccountName'= $username;
 'name'= $name;
-#'instance' = $OldUsername;
 'ChangePasswordAtLogon'= $true;
 'Credential' = $Creds;
 'AccountPassword'= $password;
@@ -56,37 +55,5 @@ New-ADUser @UserSettings -Instance $OldUsername -verbose
 
 $OldUsername.MemberOf | Add-ADGroupMember -Members $Username -Credential $creds
 
-#-OtherAttributes @{'targetaddress'=$TargetAddress;'mailnickname' = $Username; 'ProxyAddresses'= "SMTP:"+$EmailAddress; 'msExchRecipientDisplayType'=-2147483642; 'msExchRecipientTypeDetails' = 2147483648;'msExchRemoteRecipientType' = 1;}
-
-
-Invoke-Command -ComputerName $ExchangeServer -Credential $creds -ScriptBlock {
-    Start-Process -FilePath 'powershell.exe' -ArgumentList '-File "C:\Scripts\CopyuserRemoteMailbox(WIP).ps1"', "-UserName $using:Username"
-}
-
-
 $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri http://exchange2010.nffc.local/PowerShell/ -Authentication Kerberos -Credential $creds
 Invoke-Command -Session $Session -ScriptBlock {Enable-RemoteMailbox -identity $using:EmailAddress -RemoteRoutingAddress $using:TargetAddress -alias $using:Username}
-
- 
-<#
-New-ADUser `
--SamAccountName $username `
--name $name `
--Instance $OldUsername `
--ChangePasswordAtLogon $true `
--Credential $Creds `
--AccountPassword $password `
--UserPrincipalName  $EmailAddress `
--EmailAddress $EmailAddress `
--Path $Parent.Substring(7) `
--enabled $True `
--GivenName $Firstname `
--Surname $LastName `
--OtherAttributes  @{
-'targetaddress'=$TargetAddress;
-'msExchRecipientDisplayType'=-2147483642; 
-'msExchRecipientTypeDetails' = 2147483648;
-'msExchRemoteRecipientType' = 1; 
-'mailnickname' = $Username 
-}
-#>
